@@ -4,8 +4,10 @@ package config
 type Config struct {
 	ConfigPath         string
 	SecretsBackendType string
+	EncryptionKey      string // Coming from command line parameter
 	APIAppCredentials  APIAppCredentials
 	Jobs               []FolderUploadJob
+	HeadlessMode       bool // Coming from command line parameter
 }
 
 // APIAppCredentials represents Google Photos API credentials for OAuth

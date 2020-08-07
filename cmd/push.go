@@ -47,6 +47,14 @@ func (cmd *PushCmd) Run(cobraCmd *cobra.Command, args []string) error {
 		return fmt.Errorf("please review your configuration or run 'gphotos-uploader-cli init': file=%s, err=%s", cmd.CfgDir, err)
 	}
 
+	// Honor the command-line parameter
+	// TODO: I don't want to do this for every command
+	if cmd.Headless {
+		cfg.HeadlessMode = true
+		cfg.SecretsBackendType = "file"
+		cfg.EncryptionKey = cmd.EncryptionKey
+	}
+
 	cli, err := app.Start(cfg)
 	if err != nil {
 		return err
@@ -129,4 +137,5 @@ func (cmd *PushCmd) Run(cobraCmd *cobra.Command, args []string) error {
 
 	cli.Logger.Infof("%d processed files: %d successfully, %d with errors", totalItems, uploadedItems, totalItems-uploadedItems)
 	return nil
+
 }

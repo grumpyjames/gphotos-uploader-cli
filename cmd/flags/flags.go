@@ -1,6 +1,8 @@
 package flags
 
 import (
+	"os"
+
 	flag "github.com/spf13/pflag"
 )
 
@@ -12,10 +14,11 @@ const (
 
 // GlobalFlags is the flags that contains the global flags
 type GlobalFlags struct {
-	Silent   bool
-	Debug    bool
-	CfgDir   string
-	Headless bool
+	Silent        bool
+	Debug         bool
+	CfgDir        string
+	Headless      bool
+	EncryptionKey string
 }
 
 // SetGlobalFlags applies the global flags
@@ -27,6 +30,7 @@ func SetGlobalFlags(flags *flag.FlagSet) *GlobalFlags {
 	flags.BoolVar(&globalFlags.Headless, "headless", false, "Run the CLI in headless mode.")
 
 	flags.StringVar(&globalFlags.CfgDir, "config", DefaultHomeGPhotosUploaderCLIFolder, "Sets config folder path. All configuration will be keep in this folder.")
+	flags.StringVar(&globalFlags.EncryptionKey, "encrypt-key", os.Getenv("GPHOTO_UPLOADER_ENCRYPT_KEY"), "Sets the passphrase to open the token store.")
 
 	return globalFlags
 }

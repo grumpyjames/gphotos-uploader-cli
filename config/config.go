@@ -25,6 +25,7 @@ func defaultSettings() *Config {
 		ClientID:     "20637643488-1hvg8ev08r4tc16ca7j9oj3686lcf0el.apps.googleusercontent.com",
 		ClientSecret: "0JyfLYw0kyDcJO-pGg5-rW_P",
 	}
+	c.HeadlessMode = false
 	c.Jobs = make([]FolderUploadJob, 0)
 	job := FolderUploadJob{
 		Account:      "youremail@gmail.com",

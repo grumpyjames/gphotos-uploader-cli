@@ -37,6 +37,9 @@ func Start(cfg *config.Config) (*App, error) {
 	app.FileTracker = completeduploads.NewService(completeduploads.NewLevelDBRepository(ft))
 
 	// Use Keyring to store / read secrets
+	if cfg.EncryptionKey != "" {
+		// Use a promptFunc that returns a fixed string (like keyring.fixedStringPrompt())
+	}
 	kr, err := tokenstore.NewKeyringRepository(cfg.SecretsBackendType, nil, cfg.KeyringDir())
 	if err != nil {
 		return app, fmt.Errorf("open token manager failed: type=%s, err=%s", cfg.SecretsBackendType, err)
