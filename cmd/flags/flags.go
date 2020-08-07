@@ -12,9 +12,10 @@ const (
 
 // GlobalFlags is the flags that contains the global flags
 type GlobalFlags struct {
-	Silent bool
-	Debug  bool
-	CfgDir string
+	Silent   bool
+	Debug    bool
+	CfgDir   string
+	Headless bool
 }
 
 // SetGlobalFlags applies the global flags
@@ -23,6 +24,7 @@ func SetGlobalFlags(flags *flag.FlagSet) *GlobalFlags {
 
 	flags.BoolVar(&globalFlags.Debug, "debug", false, "Logs very verbose information. Useful for troubleshooting.")
 	flags.BoolVar(&globalFlags.Silent, "silent", false, "Run in silent mode and prevents any log output except panics & fatals.")
+	flags.BoolVar(&globalFlags.Headless, "headless", false, "Run the CLI in headless mode.")
 
 	flags.StringVar(&globalFlags.CfgDir, "config", DefaultHomeGPhotosUploaderCLIFolder, "Sets config folder path. All configuration will be keep in this folder.")
 
