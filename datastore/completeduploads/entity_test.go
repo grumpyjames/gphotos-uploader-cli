@@ -18,15 +18,15 @@ func TestHash(t *testing.T) {
 
 func TestCompletedUploadedFileItem_GetTrackedHash(t *testing.T) {
 	filePath := "testdata/image.png"
-	expected := "1210845310"
+	expected := uint32(1210845310)
 
 	item, err := NewCompletedUploadedFileItem(filePath)
 	if err != nil {
 		t.Errorf("error not expected at this stage: %v", err)
 	}
 
-	got := item.GetTrackedHash()
+	got := item.hash
 	if got != expected {
-		t.Errorf("got %s, want %s", got, expected)
+		t.Errorf("got %d, want %d", got, expected)
 	}
 }

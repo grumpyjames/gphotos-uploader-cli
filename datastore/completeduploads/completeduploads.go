@@ -1,8 +1,6 @@
 package completeduploads
 
 import (
-	"fmt"
-
 	"github.com/gphotosuploader/gphotos-uploader-cli/utils/filesystem"
 )
 
@@ -32,24 +30,14 @@ func (s *Service) IsAlreadyUploaded(filePath string) (bool, error) {
 		return false, nil
 	}
 
-	// value found on the cache
-
-	// get the last modified time from the cache
-	cacheMtime, err := item.GetTrackedMTime()
+	// check stored last modified time with the current one
+	// to see if the file has been modified
+	fileMtime, err := filesystem.GetMTime(filePath)
 	if err != nil {
 		return false, err
 	}
-
-	// check stored last modified time with the current one to see if the
-	// file has been modified
-	if cacheMtime != 0 {
-		fileMtime, err := filesystem.GetMTime(filePath)
-		if err != nil {
-			return false, err
-		}
-		if fileMtime.Unix() == cacheMtime {
-			return true, nil
-		}
+	if fileMtime.Unix() == item.modifyTime {
+		return true, nil
 	}
 
 	// file was not uploaded before or modified time has changed after being
@@ -60,13 +48,12 @@ func (s *Service) IsAlreadyUploaded(filePath string) (bool, error) {
 	}
 
 	// checks if the file is the same (equal hash)
-	if item.GetTrackedHash() == fmt.Sprint(fileHash) {
+	if item.hash == fileHash {
 		// update last modified time on the cache
 		err = s.CacheAsAlreadyUploaded(filePath)
 		if err != nil {
 			return true, err
 		}
-
 	}
 
 	return false, nil

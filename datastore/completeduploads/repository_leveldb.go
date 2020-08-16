@@ -1,6 +1,11 @@
 package completeduploads
 
-import "github.com/syndtr/goleveldb/leveldb"
+import (
+	"fmt"
+	"github.com/syndtr/goleveldb/leveldb"
+	"strconv"
+	"strings"
+)
 
 type LevelDBRepository struct {
 	db *leveldb.DB
@@ -23,16 +28,15 @@ func (r *LevelDBRepository) Get(path string) (CompletedUploadedFileItem, error) 
 		return CompletedUploadedFileItem{}, err
 	}
 
-	item := CompletedUploadedFileItem{
-		path:  path,
-		value: string(val),
-	}
-	return item, nil
+	return fromStoreValue(path, val)
 }
 
 // Store an item
 func (r *LevelDBRepository) Put(item CompletedUploadedFileItem) error {
-	return r.db.Put([]byte(item.path), []byte(item.value), nil)
+	return r.db.Put(
+		[]byte(item.path),
+		[]byte(toStoreValue(item)),
+		nil)
 }
 
 // Delete an item
@@ -42,4 +46,38 @@ func (r *LevelDBRepository) Delete(path string) error {
 		return ErrCannotBeDeleted
 	}
 	return nil
+}
+
+// Parse the pipe delimited parts into a fully formed file item
+func fromStoreValue(path string, value []byte) (CompletedUploadedFileItem, error) {
+	item := CompletedUploadedFileItem{
+		path: path,
+	}
+
+	parts := strings.Split(string(value), "|")
+
+	if len(parts) < 2 {
+		// FIXME: include the serialized form in the error
+		return item, fmt.Errorf("Unsupported serialization format")
+	}
+
+	hash, err := strconv.ParseUint(parts[1], 10, 32)
+	if err != nil {
+		return item, err
+	}
+	item.hash = uint32(hash)
+
+	cacheMtime, err := strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		return item, err
+	}
+
+	item.modifyTime = cacheMtime
+
+	return item, nil
+}
+
+// We store the items values as a pipe delimited string
+func toStoreValue(item CompletedUploadedFileItem) string {
+	return strconv.FormatInt(item.modifyTime, 10) + "|" + fmt.Sprint(item.hash)
 }
