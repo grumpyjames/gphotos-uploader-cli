@@ -22,6 +22,7 @@ func (s *Service) Close() error {
 }
 
 // IsAlreadyUploaded checks if the file was already uploaded
+// And potentially updates the cache's modify time!
 func (s *Service) IsAlreadyUploaded(filePath string) (bool, error) {
 	// find a previous upload in the repository
 	item, err := s.repo.Get(filePath)
@@ -50,7 +51,8 @@ func (s *Service) IsAlreadyUploaded(filePath string) (bool, error) {
 	// checks if the file is the same (equal hash)
 	if item.hash == fileHash {
 		// update last modified time on the cache
-		err = s.CacheAsAlreadyUploaded(filePath)
+		item.modifyTime = fileMtime.Unix()
+		err = s.repo.Put(item)
 		if err != nil {
 			return true, err
 		}
@@ -60,11 +62,28 @@ func (s *Service) IsAlreadyUploaded(filePath string) (bool, error) {
 }
 
 // CacheAsAlreadyUploaded marks a file as already uploaded to prevent re-uploads
-func (s *Service) CacheAsAlreadyUploaded(filePath string) error {
-	item, err := NewCompletedUploadedFileItem(filePath)
+func (s *Service) CacheAsAlreadyUploaded(
+	filePath string,
+	uploadToken string,
+	albumTitle string,
+) error {
+	item, err := NewCompletedUploadedFileItem(filePath, uploadToken, albumTitle)
 	if err != nil {
 		return err
 	}
+	return s.repo.Put(item)
+}
+
+// CacheAsAlreadyUploaded marks a file as already uploaded to prevent re-uploads
+func (s *Service) MediaItemCreated(filePath string) error {
+
+	item, err := s.repo.Get(filePath)
+	if err != nil {
+		return err
+	}
+
+	item.mediaItemCreated = true
+
 	return s.repo.Put(item)
 }
 

@@ -78,9 +78,10 @@ func (app *App) Stop() error {
 
 // FileTracker represents a service to track file already uploaded.
 type FileTracker interface {
-	CacheAsAlreadyUploaded(filePath string) error
+	CacheAsAlreadyUploaded(filePath string, uploadToken string, albumTitle string) error
 	IsAlreadyUploaded(filePath string) (bool, error)
 	RemoveAsAlreadyUploaded(filePath string) error
+	MediaItemCreated(filePath string) error
 	Close() error
 }
 

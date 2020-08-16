@@ -22,7 +22,7 @@ func TestService_IsAlreadyUploaded(t *testing.T) {
 	t.Run("already uploaded file", func(t *testing.T) {
 		filePath := "testdata/image.png"
 		expected := true
-		item, err := NewCompletedUploadedFileItem(filePath)
+		item, err := NewCompletedUploadedFileItem(filePath, "2345eeaffa", "")
 		if err != nil {
 			t.Errorf("error not expected at this stage: %v", err)
 		}
@@ -48,7 +48,7 @@ func TestService_CacheAsAlreadyUploaded(t *testing.T) {
 
 	t.Run("existing file", func(t *testing.T) {
 		filePath := "testdata/image.png"
-		err := s.CacheAsAlreadyUploaded(filePath)
+		err := s.CacheAsAlreadyUploaded(filePath, "42342", "")
 		if err != nil {
 			t.Errorf("error not expected at this stage: %v", err)
 		}
@@ -56,7 +56,7 @@ func TestService_CacheAsAlreadyUploaded(t *testing.T) {
 
 	t.Run("not existing file", func(t *testing.T) {
 		filePath := "testdata/image1.png"
-		err := s.CacheAsAlreadyUploaded(filePath)
+		err := s.CacheAsAlreadyUploaded(filePath, "42342", "")
 		if err == nil {
 			t.Errorf("error was expected at this stage: %v", err)
 		}
@@ -69,7 +69,7 @@ func TestService_RemoveAsAlreadyUploaded(t *testing.T) {
 
 	t.Run("already uploaded file", func(t *testing.T) {
 		filePath := "testdata/image.png"
-		item, err := NewCompletedUploadedFileItem(filePath)
+		item, err := NewCompletedUploadedFileItem(filePath, "42343", "")
 		if err != nil {
 			t.Errorf("error not expected at this stage: %v", err)
 		}

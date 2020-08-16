@@ -19,6 +19,14 @@ type EnqueuedJob struct {
 	DeleteOnSuccess bool
 }
 
+func uploadFile(ctx context.Context, path string, photos gPhotosService) (string, error) {
+	panic("Not implemented; should be a method on PhotosService")
+}
+
+func batchAddMediaItems(ctx context.Context, uploadTokens []string, photos gPhotosService, albumId string) (string, error) {
+	panic("Not implemented; should be a method on PhotosService")
+}
+
 func (job *EnqueuedJob) Process() error {
 	// Get or create the album
 	albumId, err := job.albumID()
@@ -26,14 +34,24 @@ func (job *EnqueuedJob) Process() error {
 		return err
 	}
 
+	token, err := uploadFile(job.Context, job.Path, job.PhotosService)
+	if err != nil {
+		return err
+	}
+
+	err = job.FileTracker.CacheAsAlreadyUploaded(job.Path, token, job.AlbumName)
+	if err != nil {
+		job.Logger.Warnf("Tracking file as uploaded failed: file=%s, error=%v", job.Path, err)
+	}
+
 	// Upload the file and add it to PhotosService.
-	_, err = job.PhotosService.AddMediaItem(job.Context, job.Path, albumId)
+	_, err = batchAddMediaItems(job.Context, []string{token}, job.PhotosService, albumId)
 	if err != nil {
 		return err
 	}
 
 	// Mark the file as uploaded in the FileTracker.
-	err = job.FileTracker.CacheAsAlreadyUploaded(job.Path)
+	err = job.FileTracker.MediaItemCreated(job.Path)
 	if err != nil {
 		job.Logger.Warnf("Tracking file as uploaded failed: file=%s, error=%v", job.Path, err)
 	}

@@ -74,10 +74,31 @@ func fromStoreValue(path string, value []byte) (CompletedUploadedFileItem, error
 
 	item.modifyTime = cacheMtime
 
+	if len(parts) == 2 {
+		// previous versions only stored an upload when it had
+		// been uploaded and had a media item created
+		item.uploadToken = ""
+		item.albumTitle = ""
+		item.mediaItemCreated = true
+	} else if len(parts) == 5 {
+		item.uploadToken = parts[2]
+		item.albumTitle = parts[3]
+		mic, err := strconv.ParseBool(parts[4])
+		if err != nil {
+			return item, err
+		}
+		item.mediaItemCreated = mic
+	}
+
 	return item, nil
 }
 
 // We store the items values as a pipe delimited string
 func toStoreValue(item CompletedUploadedFileItem) string {
-	return strconv.FormatInt(item.modifyTime, 10) + "|" + fmt.Sprint(item.hash)
+	return strconv.FormatInt(item.modifyTime, 10) +
+		"|" +
+		fmt.Sprint(item.hash) +
+		"|" + item.uploadToken +
+		"|" + item.albumTitle +
+		"|" + strconv.FormatBool(item.mediaItemCreated)
 }

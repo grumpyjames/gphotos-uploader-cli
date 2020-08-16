@@ -20,7 +20,7 @@ func TestCompletedUploadedFileItem_GetTrackedHash(t *testing.T) {
 	filePath := "testdata/image.png"
 	expected := uint32(1210845310)
 
-	item, err := NewCompletedUploadedFileItem(filePath)
+	item, err := NewCompletedUploadedFileItem(filePath, "34aeffa36dd63432", "")
 	if err != nil {
 		t.Errorf("error not expected at this stage: %v", err)
 	}

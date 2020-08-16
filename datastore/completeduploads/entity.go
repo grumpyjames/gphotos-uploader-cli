@@ -22,13 +22,19 @@ var (
 )
 
 type CompletedUploadedFileItem struct {
-	path       string
-	hash       uint32
-	modifyTime int64
+	path             string
+	hash             uint32
+	modifyTime       int64
+	uploadToken      string
+	albumTitle       string
+	mediaItemCreated bool
 }
 
 // NewCompletedUploadedFileItem creates a new item for the specified file
-func NewCompletedUploadedFileItem(filePath string) (CompletedUploadedFileItem, error) {
+func NewCompletedUploadedFileItem(
+	filePath string,
+	uploadToken string,
+	albumTitle string) (CompletedUploadedFileItem, error) {
 	item := CompletedUploadedFileItem{
 		path: filePath,
 	}
@@ -45,6 +51,8 @@ func NewCompletedUploadedFileItem(filePath string) (CompletedUploadedFileItem, e
 	}
 
 	item.modifyTime = mTime.Unix()
+	item.albumTitle = albumTitle
+	item.uploadToken = uploadToken
 
 	return item, nil
 }
